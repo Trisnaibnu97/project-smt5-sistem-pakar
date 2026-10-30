@@ -122,6 +122,51 @@ class KnowledgeBaseController extends Controller
     }
 
     /**
+     * Update hypothesis by ID.
+     */
+    public function updateHypothesis(Request $request, int $id): JsonResponse
+    {
+        $hypothesis = Hypothesis::findOrFail($id);
+
+        $validated = $request->validate([
+            'code'        => 'sometimes|string|max:20',
+            'name'        => 'sometimes|string|max:150',
+            'description' => 'nullable|string',
+        ]);
+
+        $hypothesis->update($validated);
+
+        AuditLog::record($request->user()->id, 'UPDATE_HYPOTHESIS', 'hypotheses', $hypothesis->id, [
+            'code' => $hypothesis->code,
+            'name' => $hypothesis->name,
+        ], $request->ip());
+
+        return response()->json([
+            'message'    => 'Kategori hipotesis berhasil diperbarui.',
+            'hypothesis' => $hypothesis,
+        ]);
+    }
+
+    /**
+     * Delete hypothesis by ID.
+     */
+    public function deleteHypothesis(Request $request, int $id): JsonResponse
+    {
+        $hypothesis = Hypothesis::findOrFail($id);
+        $code = $hypothesis->code;
+
+        $hypothesis->delete();
+
+        AuditLog::record($request->user()->id, 'DELETE_HYPOTHESIS', 'hypotheses', $id, [
+            'code' => $code,
+        ], $request->ip());
+
+        return response()->json([
+            'message' => "Kategori hipotesis {$code} berhasil dihapus.",
+        ]);
+    }
+
+    /**
      * Create or update indicator.
      */
     public function storeIndicator(Request $request): JsonResponse
@@ -138,9 +183,57 @@ class KnowledgeBaseController extends Controller
             $validated
         );
 
+        AuditLog::record($request->user()->id, 'STORE_INDICATOR', 'indicators', $indicator->id, [
+            'code' => $indicator->code,
+        ], $request->ip());
+
         return response()->json([
             'message'   => 'Indikator observasi berhasil disimpan.',
             'indicator' => $indicator,
+        ]);
+    }
+
+    /**
+     * Update indicator by ID.
+     */
+    public function updateIndicator(Request $request, int $id): JsonResponse
+    {
+        $indicator = Indicator::findOrFail($id);
+
+        $validated = $request->validate([
+            'code'              => 'sometimes|string|max:20',
+            'operational_text'  => 'sometimes|string',
+            'observation_guide' => 'nullable|string',
+        ]);
+
+        $indicator->update($validated);
+
+        AuditLog::record($request->user()->id, 'UPDATE_INDICATOR', 'indicators', $indicator->id, [
+            'code' => $indicator->code,
+        ], $request->ip());
+
+        return response()->json([
+            'message'   => 'Indikator observasi berhasil diperbarui.',
+            'indicator' => $indicator,
+        ]);
+    }
+
+    /**
+     * Delete indicator by ID.
+     */
+    public function deleteIndicator(Request $request, int $id): JsonResponse
+    {
+        $indicator = Indicator::findOrFail($id);
+        $code = $indicator->code;
+
+        $indicator->delete();
+
+        AuditLog::record($request->user()->id, 'DELETE_INDICATOR', 'indicators', $id, [
+            'code' => $code,
+        ], $request->ip());
+
+        return response()->json([
+            'message' => "Indikator observasi {$code} berhasil dihapus.",
         ]);
     }
 
@@ -170,9 +263,66 @@ class KnowledgeBaseController extends Controller
             ]
         );
 
+        AuditLog::record($request->user()->id, 'STORE_CF_RULE', 'cf_rules', $rule->id, [
+            'hypothesis_id' => $rule->hypothesis_id,
+            'indicator_id'  => $rule->indicator_id,
+            'expert_cf'     => $expertCf,
+        ], $request->ip());
+
         return response()->json([
             'message' => 'Aturan bobot pakar Certainty Factor berhasil disimpan.',
             'rule'    => $rule,
+        ]);
+    }
+
+    /**
+     * Update CF rule by ID.
+     */
+    public function updateRule(Request $request, int $id): JsonResponse
+    {
+        $rule = CfRule::findOrFail($id);
+
+        $validated = $request->validate([
+            'expert_mb' => 'required|numeric|between:0,1',
+            'expert_md' => 'required|numeric|between:0,1',
+        ]);
+
+        $expertCf = round($validated['expert_mb'] - $validated['expert_md'], 3);
+
+        $rule->update([
+            'expert_mb' => $validated['expert_mb'],
+            'expert_md' => $validated['expert_md'],
+            'expert_cf' => $expertCf,
+        ]);
+
+        AuditLog::record($request->user()->id, 'UPDATE_CF_RULE', 'cf_rules', $rule->id, [
+            'hypothesis_id' => $rule->hypothesis_id,
+            'indicator_id'  => $rule->indicator_id,
+            'expert_cf'     => $expertCf,
+        ], $request->ip());
+
+        return response()->json([
+            'message' => 'Bobot aturan Certainty Factor berhasil diperbarui.',
+            'rule'    => $rule,
+        ]);
+    }
+
+    /**
+     * Delete CF rule by ID.
+     */
+    public function deleteRule(Request $request, int $id): JsonResponse
+    {
+        $rule = CfRule::findOrFail($id);
+
+        $rule->delete();
+
+        AuditLog::record($request->user()->id, 'DELETE_CF_RULE', 'cf_rules', $id, [
+            'hypothesis_id' => $rule->hypothesis_id,
+            'indicator_id'  => $rule->indicator_id,
+        ], $request->ip());
+
+        return response()->json([
+            'message' => 'Aturan bobot Certainty Factor berhasil dihapus.',
         ]);
     }
 }

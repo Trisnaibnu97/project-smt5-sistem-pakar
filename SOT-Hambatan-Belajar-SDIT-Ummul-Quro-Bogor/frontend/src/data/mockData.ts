@@ -7,7 +7,7 @@ export const ROLES: Record<RoleType, UserProfile> = {
     initials: 'UR',
     email: 'bk@sdit-uq.sch.id',
     defaultPage: 'dashboard-bk',
-    allowedNav: ['dashboard', 'skrining', 'daftar-siswa', 'tindak-lanjut', 'laporan', 'panduan'],
+    allowedNav: ['dashboard', 'skrining', 'daftar-siswa', 'basis-pengetahuan', 'tindak-lanjut', 'laporan', 'panduan'],
   },
   wali: {
     name: 'Ustadz Ahmad, S.Pd (Wali 3A)',

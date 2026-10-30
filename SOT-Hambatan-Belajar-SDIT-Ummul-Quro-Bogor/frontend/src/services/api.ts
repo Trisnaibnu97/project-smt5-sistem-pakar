@@ -246,4 +246,65 @@ export const api = {
   async getAuditLogs() {
     return this.request<{ data: any[] }>('/admin/audit-logs');
   },
+
+  // Knowledge Base CRUD (Admin & Guru BK)
+  async createHypothesis(payload: { kb_version_id: number; code: string; name: string; description?: string }) {
+    return this.request<{ message: string; hypothesis: any }>('/admin/hypotheses', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  async updateHypothesis(id: number, payload: { code?: string; name?: string; description?: string }) {
+    return this.request<{ message: string; hypothesis: any }>(`/admin/hypotheses/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  async deleteHypothesis(id: number) {
+    return this.request<{ message: string }>(`/admin/hypotheses/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
+  async createIndicator(payload: { kb_version_id: number; code: string; operational_text: string; observation_guide?: string }) {
+    return this.request<{ message: string; indicator: any }>('/admin/indicators', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  async updateIndicator(id: number, payload: { code?: string; operational_text?: string; observation_guide?: string }) {
+    return this.request<{ message: string; indicator: any }>(`/admin/indicators/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  async deleteIndicator(id: number) {
+    return this.request<{ message: string }>(`/admin/indicators/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
+  async createRule(payload: { hypothesis_id: number; indicator_id: number; expert_mb: number; expert_md: number }) {
+    return this.request<{ message: string; rule: any }>('/admin/cf-rules', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  async updateRule(id: number, payload: { expert_mb: number; expert_md: number }) {
+    return this.request<{ message: string; rule: any }>(`/admin/cf-rules/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  async deleteRule(id: number) {
+    return this.request<{ message: string }>(`/admin/cf-rules/${id}`, {
+      method: 'DELETE',
+    });
+  },
 };

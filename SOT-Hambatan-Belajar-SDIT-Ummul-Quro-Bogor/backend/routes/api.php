@@ -50,18 +50,24 @@ Route::middleware('auth:sanctum')->group(function () {
     // Aggregate Reports (Privacy-first)
     Route::get('/reports/aggregate', [ReportController::class, 'aggregate']);
 
-    // Admin & Guru BK - Knowledge Base Review
+    // Admin & Guru BK - Knowledge Base Review & Management (CRUD)
     Route::middleware('role:admin,guru_bk')->group(function () {
         Route::get('/admin/kb-versions', [KnowledgeBaseController::class, 'indexVersions']);
-    });
-
-    // Admin Only - KB Management, Activation & Audit Logs
-    Route::middleware('role:admin')->group(function () {
         Route::post('/admin/kb-versions', [KnowledgeBaseController::class, 'storeVersion']);
         Route::post('/admin/kb-versions/{id}/activate', [KnowledgeBaseController::class, 'activateVersion']);
         Route::post('/admin/hypotheses', [KnowledgeBaseController::class, 'storeHypothesis']);
+        Route::put('/admin/hypotheses/{id}', [KnowledgeBaseController::class, 'updateHypothesis']);
+        Route::delete('/admin/hypotheses/{id}', [KnowledgeBaseController::class, 'deleteHypothesis']);
         Route::post('/admin/indicators', [KnowledgeBaseController::class, 'storeIndicator']);
+        Route::put('/admin/indicators/{id}', [KnowledgeBaseController::class, 'updateIndicator']);
+        Route::delete('/admin/indicators/{id}', [KnowledgeBaseController::class, 'deleteIndicator']);
         Route::post('/admin/cf-rules', [KnowledgeBaseController::class, 'storeRule']);
+        Route::put('/admin/cf-rules/{id}', [KnowledgeBaseController::class, 'updateRule']);
+        Route::delete('/admin/cf-rules/{id}', [KnowledgeBaseController::class, 'deleteRule']);
+    });
+
+    // Admin Only - Audit Logs
+    Route::middleware('role:admin')->group(function () {
         Route::get('/admin/audit-logs', [AuditLogController::class, 'index']);
     });
 });
