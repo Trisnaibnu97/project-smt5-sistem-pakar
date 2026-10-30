@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <!-- Background Rounded Shield / Badge -->
+  <rect width="48" height="48" rx="14" fill="#1b4332"/>
+  
+  <!-- Friendly House Roof (Rumah) -->
+  <path d="M24 10L10 21H14V36C14 37.1 14.9 38 16 38H32C33.1 38 34 37.1 34 36V21H38L24 10Z" fill="#2d6a4f"/>
+  
+  <!-- Heart / Caring Hands (Sahabat) -->
+  <path d="M24 20C21.8 17.5 18 18 16.5 20.8C15 23.5 16.5 26.8 24 32C31.5 26.8 33 23.5 31.5 20.8C30 18 26.2 17.5 24 20Z" fill="#ffb703"/>
+</svg>

@@ -1,0 +1,17 @@
+{
+    "name":  "sot-hambatan-belajar-sdit-ummul-quro-bogor-root",
+    "version":  "1.0.0",
+    "private":  true,
+    "scripts":  {
+                    "dev":  "npm --prefix SOT-Hambatan-Belajar-SDIT-Ummul-Quro-Bogor/frontend run dev",
+                    "frontend:start":  "npm --prefix SOT-Hambatan-Belajar-SDIT-Ummul-Quro-Bogor/frontend run dev",
+                    "frontend:dev":  "npm --prefix SOT-Hambatan-Belajar-SDIT-Ummul-Quro-Bogor/frontend run dev",
+                    "build":  "npm --prefix SOT-Hambatan-Belajar-SDIT-Ummul-Quro-Bogor/frontend run build",
+                    "lint":  "npm --prefix SOT-Hambatan-Belajar-SDIT-Ummul-Quro-Bogor/frontend run lint",
+                    "preview":  "npm --prefix SOT-Hambatan-Belajar-SDIT-Ummul-Quro-Bogor/frontend run preview",
+                    "backend:test":  "cd SOT-Hambatan-Belajar-SDIT-Ummul-Quro-Bogor/backend \u0026\u0026 php artisan test",
+                    "backend:serve":  "cd SOT-Hambatan-Belajar-SDIT-Ummul-Quro-Bogor/backend \u0026\u0026 php artisan serve --port=8000",
+                    "backend:backup":  "cd SOT-Hambatan-Belajar-SDIT-Ummul-Quro-Bogor/backend \u0026\u0026 php artisan sipakar:backup-db",
+                    "backend:smoke-test":  "cd SOT-Hambatan-Belajar-SDIT-Ummul-Quro-Bogor/backend \u0026\u0026 php artisan sipakar:smoke-test"
+                }
+}
