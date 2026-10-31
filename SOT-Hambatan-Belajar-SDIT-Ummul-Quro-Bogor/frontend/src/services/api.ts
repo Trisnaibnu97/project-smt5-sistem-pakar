@@ -2,7 +2,8 @@
  * API Client — Integrasi Frontend dengan Backend Laravel SiPakar
  */
 
-const API_BASE_URL = '/api';
+const envUrl = (import.meta as any).env?.VITE_API_URL;
+const API_BASE_URL = envUrl ? (envUrl.endsWith('/') ? `${envUrl}api` : `${envUrl}/api`) : '/api';
 
 export class ApiError extends Error {
   status: number;
