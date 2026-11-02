@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: sipakar-backend
+    runtime: php
+    region: singapore
+    plan: free
+    rootDir: SOT-Hambatan-Belajar-SDIT-Ummul-Quro-Bogor/backend
+    buildCommand: composer install --no-dev --optimize-autoloader
+    startCommand: bash run.sh
+    envVars:
+      - key: APP_NAME
+        value: "SiPakar SDIT Ummul Quro"
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_KEY
+        generateValue: true
+      - key: DB_CONNECTION
+        value: sqlite
+      - key: DB_DATABASE
+        value: /opt/render/project/src/SOT-Hambatan-Belajar-SDIT-Ummul-Quro-Bogor/backend/database/database.sqlite
+      - key: SESSION_DRIVER
+        value: file
+      - key: CACHE_STORE
+        value: file
