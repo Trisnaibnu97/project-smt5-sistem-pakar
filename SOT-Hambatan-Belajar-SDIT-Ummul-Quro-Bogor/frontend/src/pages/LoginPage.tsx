@@ -5,8 +5,10 @@ import { api, ApiError } from '../services/api';
 import { Logo } from '../components/Logo';
 
 interface LoginPageProps {
+  initialTab?: 'login' | 'register';
   onLogin: (role: RoleType, profile: UserProfile) => void;
   onShowToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
+  onBackToHome?: () => void;
 }
 
 function mapBackendRole(backendRole: string): RoleType {
@@ -21,8 +23,13 @@ interface PublicClassItem {
   name: string;
 }
 
-export const LoginPage: React.FC<LoginPageProps> = ({ onLogin, onShowToast }) => {
-  const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
+export const LoginPage: React.FC<LoginPageProps> = ({
+  initialTab = 'login',
+  onLogin,
+  onShowToast,
+  onBackToHome,
+}) => {
+  const [activeTab, setActiveTab] = useState<'login' | 'register'>(initialTab);
 
   // Login form state
   const [loginEmail, setLoginEmail] = useState('');
@@ -154,7 +161,19 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin, onShowToast }) =>
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-gradient-to-br from-primary-light via-page to-accent-light">
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-gradient-to-br from-primary-light via-page to-accent-light relative">
+      {onBackToHome && (
+        <button
+          onClick={onBackToHome}
+          className="absolute top-6 left-6 inline-flex items-center gap-2 text-sm font-semibold text-muted hover:text-primary transition-colors bg-surface/80 backdrop-blur px-3.5 py-2 rounded-xl border border-border shadow-xs"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+          </svg>
+          Kembali ke Beranda
+        </button>
+      )}
+
       <div className="w-full max-w-md">
         {/* Logo & Heading */}
         <div className="flex flex-col items-center mb-6">

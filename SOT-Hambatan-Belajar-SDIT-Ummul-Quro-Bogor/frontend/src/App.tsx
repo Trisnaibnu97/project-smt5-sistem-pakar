@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { RoleType, ToastState, UserProfile } from './types';
 import { ROLES } from './data/mockData';
 import { api } from './services/api';
+import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
@@ -25,12 +26,16 @@ function mapBackendRole(backendRole: string): RoleType {
   return 'admin';
 }
 
+/** Pre-login view: landing page → login/register form */
+type AuthView = 'landing' | 'login' | 'register';
+
 export const App: React.FC = () => {
   const [currentRole, setCurrentRole] = useState<RoleType | null>(null);
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
   const [currentPage, setCurrentPage] = useState<string>('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [toast, setToast] = useState<ToastState>({ show: false, msg: '', type: 'success' });
+  const [authView, setAuthView] = useState<AuthView>('landing');
 
   // On app start: restore session from stored token
   useEffect(() => {
@@ -81,6 +86,7 @@ export const App: React.FC = () => {
     setCurrentRole(null);
     setCurrentUser(null);
     setCurrentPage('dashboard');
+    setAuthView('landing');
     showToast('Anda telah keluar dari sesi.', 'info');
   };
 
@@ -89,11 +95,28 @@ export const App: React.FC = () => {
     window.scrollTo(0, 0);
   };
 
-  // If not logged in, render Login page
+  // If not logged in, show Landing Page or Login/Register page
   if (!currentRole || !currentUser) {
+    if (authView === 'landing') {
+      return (
+        <>
+          <LandingPage
+            onGoToLogin={() => setAuthView('login')}
+            onGoToRegister={() => setAuthView('register')}
+          />
+          <Toast toast={toast} />
+        </>
+      );
+    }
+
     return (
       <>
-        <LoginPage onLogin={handleLogin} onShowToast={showToast} />
+        <LoginPage
+          initialTab={authView === 'register' ? 'register' : 'login'}
+          onLogin={handleLogin}
+          onShowToast={showToast}
+          onBackToHome={() => setAuthView('landing')}
+        />
         <Toast toast={toast} />
       </>
     );

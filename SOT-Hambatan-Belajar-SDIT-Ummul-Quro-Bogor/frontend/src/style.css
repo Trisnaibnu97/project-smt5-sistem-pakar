@@ -6,6 +6,7 @@
 
 @layer base {
   * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
   body { @apply font-sans bg-page text-ink; }
   :focus-visible { @apply outline-2 outline-offset-2 outline-primary; }
 }
