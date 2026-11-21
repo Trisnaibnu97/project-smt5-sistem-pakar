@@ -15,6 +15,7 @@ import { SkriningPage } from './pages/SkriningPage';
 import { BasisPengetahuanPage } from './pages/BasisPengetahuanPage';
 import { TindakLanjutPage } from './pages/TindakLanjutPage';
 import { KelolaPenggunaPage } from './pages/KelolaPenggunaPage';
+import { KelolaLandingPage } from './pages/KelolaLandingPage';
 import { LaporanPage } from './pages/LaporanPage';
 import { PanduanPage } from './pages/PanduanPage';
 
@@ -143,6 +144,8 @@ export const App: React.FC = () => {
         return <BasisPengetahuanPage onShowToast={showToast} />;
       case 'kelola-pengguna':
         return <KelolaPenggunaPage onShowToast={showToast} />;
+      case 'kelola-landing':
+        return <KelolaLandingPage onShowToast={showToast} onPreviewLanding={() => setAuthView('landing')} />;
       case 'laporan':
         return <LaporanPage />;
       case 'panduan':

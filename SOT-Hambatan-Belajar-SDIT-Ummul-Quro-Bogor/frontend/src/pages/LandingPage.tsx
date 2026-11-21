@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import { getLandingConfig } from '../services/landingConfig';
 
 interface LandingPageProps {
   onGoToLogin: () => void;
@@ -7,6 +8,7 @@ interface LandingPageProps {
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onGoToLogin, onGoToRegister }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const config = useMemo(() => getLandingConfig(), []);
 
   const scrollTo = (id: string) => {
     setMobileMenuOpen(false);
@@ -155,25 +157,25 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToLogin, onGoToReg
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 border border-[#15803D]/25 shadow-xs">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#15803D] animate-ping" />
                 <span className="text-xs font-bold text-[#166534]">
-                  Sistem Pakar Certainty Factor & Forward Chaining
+                  {config.hero.badge}
                 </span>
               </div>
 
               {/* Main Headline */}
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0F172A] tracking-tight leading-[1.2]">
-                Deteksi Dini Hambatan Belajar Siswa{' '}
+                {config.hero.headlinePart1}{' '}
                 <span className="text-[#15803D] underline decoration-[#F59E0B] decoration-wavy underline-offset-8">
-                  Lebih Cepat
+                  {config.hero.highlight1}
                 </span>{' '}
-                dan{' '}
+                {config.hero.headlinePart2}{' '}
                 <span className="text-[#15803D]">
-                  Akurat.
+                  {config.hero.highlight2}
                 </span>
               </h1>
 
               {/* Sub-headline */}
               <p className="text-base sm:text-lg text-[#475569] max-w-2xl mx-auto lg:mx-0 leading-relaxed font-normal">
-                Bantu Wali Kelas dan Guru BK menganalisis gejala akademik, emosional, dan perilaku siswa secara objektif menggunakan teknologi Sistem Pakar.
+                {config.hero.subheadline}
               </p>
 
               {/* CTA Buttons (Amber/Soft Orange & Outline) */}
@@ -182,7 +184,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToLogin, onGoToReg
                   onClick={onGoToLogin}
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-[#F59E0B] hover:bg-[#D97706] active:scale-95 text-white font-extrabold text-base px-8 py-3.5 rounded-xl shadow-lg shadow-[#F59E0B]/30 hover:shadow-xl transition-all duration-200"
                 >
-                  <span>Mulai Diagnosa Sekarang</span>
+                  <span>{config.hero.ctaPrimaryText}</span>
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                   </svg>
@@ -192,23 +194,23 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToLogin, onGoToReg
                   onClick={() => scrollTo('cara-kerja')}
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border-2 border-[#15803D] text-[#15803D] hover:bg-[#DCFCE7]/50 active:scale-95 font-bold text-base px-7 py-3.5 rounded-xl transition-all duration-200"
                 >
-                  Pelajari Lebih Lanjut
+                  {config.hero.ctaSecondaryText}
                 </button>
               </div>
 
               {/* Micro Trust Indicators */}
               <div className="pt-6 border-t border-[#E2E8F0]/80 grid grid-cols-3 gap-3 text-left">
                 <div className="bg-white/70 backdrop-blur rounded-xl p-3 border border-[#E2E8F0]">
-                  <p className="text-xl font-black text-[#15803D]">20+</p>
-                  <p className="text-[11px] text-[#64748B] font-medium leading-tight mt-0.5">Indikator Observasi Terstandar</p>
+                  <p className="text-xl font-black text-[#15803D]">{config.hero.stat1Number}</p>
+                  <p className="text-[11px] text-[#64748B] font-medium leading-tight mt-0.5">{config.hero.stat1Label}</p>
                 </div>
                 <div className="bg-white/70 backdrop-blur rounded-xl p-3 border border-[#E2E8F0]">
-                  <p className="text-xl font-black text-[#F59E0B]">5 Fokus</p>
-                  <p className="text-[11px] text-[#64748B] font-medium leading-tight mt-0.5">Klasifikasi Masalah Siswa</p>
+                  <p className="text-xl font-black text-[#F59E0B]">{config.hero.stat2Number}</p>
+                  <p className="text-[11px] text-[#64748B] font-medium leading-tight mt-0.5">{config.hero.stat2Label}</p>
                 </div>
                 <div className="bg-white/70 backdrop-blur rounded-xl p-3 border border-[#E2E8F0]">
-                  <p className="text-xl font-black text-[#1E3A5F]">100%</p>
-                  <p className="text-[11px] text-[#64748B] font-medium leading-tight mt-0.5">Kerahasiaan Privasi Siswa</p>
+                  <p className="text-xl font-black text-[#1E3A5F]">{config.hero.stat3Number}</p>
+                  <p className="text-[11px] text-[#64748B] font-medium leading-tight mt-0.5">{config.hero.stat3Label}</p>
                 </div>
               </div>
             </div>
@@ -314,79 +316,76 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToLogin, onGoToReg
           {/* Section Header */}
           <div className="text-center max-w-3xl mx-auto space-y-3 mb-16">
             <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#DCFCE7] text-[#166534] text-xs font-bold tracking-wider uppercase">
-              Fitur & Keunggulan
+              {config.features.sectionBadge}
             </span>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0F172A] tracking-tight">
-              Kenapa Memilih <span className="text-[#15803D]">EduCare</span>?
+              {config.features.sectionTitle}
             </h2>
             <p className="text-base text-[#64748B] leading-relaxed">
-              Dirancang khusus membantu Wali Kelas dan Guru BK mendiagnosa hambatan belajar lebih cepat, terstruktur, dan berbasis metode ilmiah.
+              {config.features.sectionSubtitle}
             </p>
           </div>
 
           {/* 3 Columns Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
 
-            {/* Card 1: Otak / AI */}
+            {/* Card 1 */}
             <div className="relative group bg-[#F8FAF8] hover:bg-white rounded-2xl p-8 border border-[#E2E8F0] hover:border-[#15803D]/40 hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
               <div className="space-y-4">
                 <div className="w-14 h-14 rounded-2xl bg-[#DCFCE7] text-[#15803D] flex items-center justify-center group-hover:scale-110 transition-transform shadow-inner">
-                  {/* Ikon Otak / AI */}
                   <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                   </svg>
                 </div>
                 <h3 className="text-xl font-bold text-[#0F172A]">
-                  Berbasis Pengetahuan Pakar
+                  {config.features.items[0]?.title || 'Certainty Factor Multi-Hipotesis'}
                 </h3>
                 <p className="text-sm text-[#475569] leading-relaxed">
-                  Mengimplementasikan algoritma <span className="font-semibold text-[#15803D]">Certainty Factor & Forward Chaining</span> yang dirumuskan secara langsung berdasarkan kaidah bimbingan konseling dan psikopedagogik.
+                  {config.features.items[0]?.desc}
                 </p>
               </div>
               <div className="mt-6 pt-4 border-t border-[#E2E8F0] flex items-center text-xs font-bold text-[#15803D]">
-                <span>Tingkat Kepastian Matematis Terukur</span>
+                <span>{config.features.items[0]?.badge || 'Tingkat Kepastian Matematis Terukur'}</span>
               </div>
             </div>
 
-            {/* Card 2: Cepat / Petir */}
+            {/* Card 2 */}
             <div className="relative group bg-[#FFFDF8] hover:bg-white rounded-2xl p-8 border border-[#FDE68A] hover:border-[#F59E0B]/60 hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
               <div className="space-y-4">
                 <div className="w-14 h-14 rounded-2xl bg-[#FEF3C7] text-[#D97706] flex items-center justify-center group-hover:scale-110 transition-transform shadow-inner">
-                  {/* Ikon Cepat / Petir */}
                   <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 </div>
                 <h3 className="text-xl font-bold text-[#0F172A]">
-                  Hasil Diagnosa Instan
+                  {config.features.items[1]?.title || 'Kolaborasi Wali Kelas & BK'}
                 </h3>
                 <p className="text-sm text-[#475569] leading-relaxed">
-                  Menghemat waktu observasi manual secara drastis. Begitu indikator gejala dipilih, sistem langsung mengkalkulasi skor kepastian hambatan belajar dalam hitungan detik.
+                  {config.features.items[1]?.desc}
                 </p>
               </div>
               <div className="mt-6 pt-4 border-t border-[#FDE68A] flex items-center text-xs font-bold text-[#D97706]">
-                <span>Efisiensi Waktu Guru & Konselor</span>
+                <span>{config.features.items[1]?.badge || 'Efisiensi Waktu Guru & Konselor'}</span>
               </div>
             </div>
 
-            {/* Card 3: Dokumen / Laporan */}
+            {/* Card 3 */}
             <div className="relative group bg-[#F8FAF8] hover:bg-white rounded-2xl p-8 border border-[#E2E8F0] hover:border-[#15803D]/40 hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
               <div className="space-y-4">
                 <div className="w-14 h-14 rounded-2xl bg-[#DCFCE7] text-[#15803D] flex items-center justify-center group-hover:scale-110 transition-transform shadow-inner">
-                  {/* Ikon Dokumen / Laporan */}
                   <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
                 <h3 className="text-xl font-bold text-[#0F172A]">
-                  Rekomendasi Terarah
+                  {config.features.items[2]?.title || 'Tindak Lanjut & Intervensi Terarah'}
                 </h3>
                 <p className="text-sm text-[#475569] leading-relaxed">
-                  Bukan hanya diagnosis, tetapi memberikan solusi intervensi awal otomatis: panduan langkah konseling, penyesuaian proses belajar, hingga arahan rujukan ahli bila diperlukan.
+                  {config.features.items[2]?.desc}
                 </p>
               </div>
               <div className="mt-6 pt-4 border-t border-[#E2E8F0] flex items-center text-xs font-bold text-[#15803D]">
-                <span>Tindak Lanjut Solutif & Aplikatif</span>
+                <span>{config.features.items[2]?.badge || 'Tindak Lanjut Solutif & Aplikatif'}</span>
               </div>
             </div>
 
@@ -629,27 +628,33 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToLogin, onGoToReg
               </div>
               <div>
                 <span className="font-extrabold text-lg text-[#15803D] leading-none block">EduCare</span>
-                <span className="text-xs text-[#64748B]">Sistem Pakar Diagnosa Dini Hambatan Belajar Siswa</span>
+                <span className="text-xs text-[#64748B] block mt-0.5">{config.contact.schoolName} · {config.contact.unitName}</span>
+                <span className="text-[11px] text-[#94A3B8] block">{config.contact.address}</span>
               </div>
             </div>
 
-            {/* Quick Links */}
-            <div className="flex flex-wrap items-center gap-6 text-sm font-medium text-[#475569]">
-              <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-[#15803D] transition-colors">
-                Beranda
-              </button>
-              <button onClick={() => scrollTo('keunggulan')} className="hover:text-[#15803D] transition-colors">
-                Keunggulan
-              </button>
-              <button onClick={() => scrollTo('cara-kerja')} className="hover:text-[#15803D] transition-colors">
-                Cara Kerja
-              </button>
-              <button onClick={() => scrollTo('diagnosa')} className="hover:text-[#15803D] transition-colors">
-                Lingkup Diagnosa
-              </button>
-              <button onClick={onGoToLogin} className="text-[#1E3A5F] font-bold hover:underline">
-                Kontak Admin
-              </button>
+            {/* Quick Links & Contact Info */}
+            <div className="flex flex-col md:items-end gap-2 text-right">
+              <div className="flex flex-wrap items-center gap-6 text-sm font-medium text-[#475569]">
+                <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-[#15803D] transition-colors">
+                  Beranda
+                </button>
+                <button onClick={() => scrollTo('keunggulan')} className="hover:text-[#15803D] transition-colors">
+                  Keunggulan
+                </button>
+                <button onClick={() => scrollTo('cara-kerja')} className="hover:text-[#15803D] transition-colors">
+                  Cara Kerja
+                </button>
+                <button onClick={() => scrollTo('diagnosa')} className="hover:text-[#15803D] transition-colors">
+                  Lingkup Diagnosa
+                </button>
+                <button onClick={onGoToLogin} className="text-[#1E3A5F] font-bold hover:underline">
+                  Kontak Admin
+                </button>
+              </div>
+              <p className="text-xs text-[#64748B]">
+                Hotline: <span className="font-semibold text-slate-800">{config.contact.phone}</span> | Email: <span className="font-semibold text-slate-800">{config.contact.email}</span>
+              </p>
             </div>
           </div>
 
@@ -658,7 +663,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToLogin, onGoToReg
               Dikembangkan oleh <span className="font-bold text-[#0F172A]">Trisna Ibnu Maknun</span> — STIKOM El Rahma
             </p>
             <p>
-              &copy; 2026 EduCare · SDIT Ummul Quro Bogor. Seluruh hak cipta dilindungi.
+              &copy; 2026 EduCare · {config.contact.schoolName}. Seluruh hak cipta dilindungi.
             </p>
           </div>
         </div>
