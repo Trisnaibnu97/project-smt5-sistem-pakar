@@ -23,7 +23,7 @@ export const ROLES: Record<RoleType, UserProfile> = {
     initials: 'AS',
     email: 'admin@sdit-uq.sch.id',
     defaultPage: 'dashboard-admin',
-    allowedNav: ['dashboard', 'basis-pengetahuan', 'daftar-siswa', 'laporan', 'panduan'],
+    allowedNav: ['dashboard', 'basis-pengetahuan', 'kelola-pengguna', 'daftar-siswa', 'laporan', 'panduan'],
   },
 };
 

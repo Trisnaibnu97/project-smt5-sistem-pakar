@@ -7,6 +7,7 @@ export interface UserProfile {
   email: string;
   defaultPage: string;
   allowedNav: string[];
+  classes?: Array<{ id: number; name: string; grade_level: number }>;
 }
 
 export interface Student {

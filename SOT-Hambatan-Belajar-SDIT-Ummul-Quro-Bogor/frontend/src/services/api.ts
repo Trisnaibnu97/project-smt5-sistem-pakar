@@ -97,6 +97,16 @@ export const api = {
     }>('/public/classes');
   },
 
+  async resetPassword(email: string) {
+    return this.request<{
+      message: string;
+      default_password: string;
+    }>('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+  },
+
   async logout() {
     try {
       await this.request('/auth/logout', { method: 'POST' });
@@ -246,6 +256,45 @@ export const api = {
 
   async getAuditLogs() {
     return this.request<{ data: any[] }>('/admin/audit-logs');
+  },
+
+  // User Management / Manajemen Akun Pendidik (Admin Only)
+  async getUsers() {
+    return this.request<{ users: any[] }>('/admin/users');
+  },
+
+  async createUser(payload: {
+    name: string;
+    email: string;
+    password: string;
+    role: 'admin' | 'guru_bk' | 'wali_kelas';
+    class_id?: number | null;
+    is_active?: boolean;
+  }) {
+    return this.request<{ message: string; user: any }>('/admin/users', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  async updateUser(id: number, payload: {
+    name: string;
+    email: string;
+    password?: string;
+    role: 'admin' | 'guru_bk' | 'wali_kelas';
+    class_id?: number | null;
+    is_active?: boolean;
+  }) {
+    return this.request<{ message: string; user: any }>(`/admin/users/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  async deleteUser(id: number) {
+    return this.request<{ message: string }>(`/admin/users/${id}`, {
+      method: 'DELETE',
+    });
   },
 
   // Knowledge Base CRUD (Admin & Guru BK)

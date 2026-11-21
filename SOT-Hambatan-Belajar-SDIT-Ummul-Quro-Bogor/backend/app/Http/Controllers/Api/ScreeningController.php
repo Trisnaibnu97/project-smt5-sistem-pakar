@@ -33,6 +33,7 @@ class ScreeningController extends Controller
             'student.schoolClass',
             'conductedByUser:id,name,role',
             'results.hypothesis',
+            'followUps.createdByUser:id,name,role',
         ]);
 
         if ($user->isWaliKelas()) {

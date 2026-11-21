@@ -587,7 +587,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToLogin, onGoToReg
       <section className="bg-gradient-to-r from-[#166534] via-[#15803D] to-[#14532D] text-white py-16">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white text-xs font-semibold backdrop-blur">
-            SMPIT Ummul Quro Bogor · Rumah Sahabat
+            SDIT Ummul Quro Bogor · Rumah Sahabat
           </div>
           <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight">
             Siap Membantu Setiap Siswa Menggapai Potensi Terbaiknya?

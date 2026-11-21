@@ -14,6 +14,7 @@ import { DaftarSiswaPage } from './pages/DaftarSiswaPage';
 import { SkriningPage } from './pages/SkriningPage';
 import { BasisPengetahuanPage } from './pages/BasisPengetahuanPage';
 import { TindakLanjutPage } from './pages/TindakLanjutPage';
+import { KelolaPenggunaPage } from './pages/KelolaPenggunaPage';
 import { LaporanPage } from './pages/LaporanPage';
 import { PanduanPage } from './pages/PanduanPage';
 
@@ -48,6 +49,7 @@ export const App: React.FC = () => {
             ...ROLES[role],
             name: res.user.name,
             email: res.user.email,
+            classes: res.user.classes,
           };
           setCurrentRole(role);
           setCurrentUser(profile);
@@ -128,7 +130,7 @@ export const App: React.FC = () => {
       case 'dashboard-bk':
         return <DashboardBK onNavigate={handleNavigate} />;
       case 'dashboard-wali':
-        return <DashboardWali onNavigate={handleNavigate} />;
+        return <DashboardWali onNavigate={handleNavigate} currentUser={currentUser} />;
       case 'dashboard-admin':
         return <DashboardAdmin onNavigate={handleNavigate} />;
       case 'skrining':
@@ -139,13 +141,15 @@ export const App: React.FC = () => {
         return <TindakLanjutPage onShowToast={showToast} />;
       case 'basis-pengetahuan':
         return <BasisPengetahuanPage onShowToast={showToast} />;
+      case 'kelola-pengguna':
+        return <KelolaPenggunaPage onShowToast={showToast} />;
       case 'laporan':
         return <LaporanPage />;
       case 'panduan':
         return <PanduanPage currentRole={currentRole} />;
       default:
         if (currentRole === 'bk') return <DashboardBK onNavigate={handleNavigate} />;
-        if (currentRole === 'wali') return <DashboardWali onNavigate={handleNavigate} />;
+        if (currentRole === 'wali') return <DashboardWali onNavigate={handleNavigate} currentUser={currentUser} />;
         return <DashboardAdmin onNavigate={handleNavigate} />;
     }
   };

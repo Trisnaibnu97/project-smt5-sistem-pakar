@@ -160,4 +160,38 @@ class AuthController extends Controller
             ],
         ]);
     }
+
+    /**
+     * Reset password user ke password default ('password123') berdasarkan email.
+     */
+    public function resetPassword(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'email' => 'required|email|exists:users,email',
+        ], [
+            'email.required' => 'Email wajib diisi.',
+            'email.email'    => 'Format email tidak valid.',
+            'email.exists'   => 'Alamat email tidak terdaftar dalam sistem.',
+        ]);
+
+        $user = User::where('email', $validated['email'])->firstOrFail();
+
+        $defaultPassword = 'password123';
+        $user->password = Hash::make($defaultPassword);
+        $user->save();
+
+        AuditLog::record(
+            $user->id,
+            'RESET_PASSWORD_DEFAULT',
+            'users',
+            $user->id,
+            ['reset_to_default' => true],
+            $request->ip()
+        );
+
+        return response()->json([
+            'message' => 'Kata sandi berhasil direset ke default: password123. Silakan masuk menggunakan kata sandi tersebut.',
+            'default_password' => $defaultPassword,
+        ]);
+    }
 }

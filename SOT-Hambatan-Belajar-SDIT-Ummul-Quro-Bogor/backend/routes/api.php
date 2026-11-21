@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\KnowledgeBaseController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\ScreeningController;
 use App\Http\Controllers\Api\StudentController;
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,6 +19,7 @@ use Illuminate\Support\Facades\Route;
 // Public Authentication Routes & Class List for Registration
 Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/auth/register', [AuthController::class, 'register']);
+Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']);
 Route::get('/public/classes', function () {
     return response()->json([
         'classes' => \App\Models\SchoolClass::orderBy('grade_level')->orderBy('name')->get(),
@@ -66,8 +68,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/admin/cf-rules/{id}', [KnowledgeBaseController::class, 'deleteRule']);
     });
 
-    // Admin Only - Audit Logs
+    // Admin Only - User Management & Audit Logs
     Route::middleware('role:admin')->group(function () {
+        Route::get('/admin/users', [UserController::class, 'index']);
+        Route::post('/admin/users', [UserController::class, 'store']);
+        Route::put('/admin/users/{id}', [UserController::class, 'update']);
+        Route::delete('/admin/users/{id}', [UserController::class, 'destroy']);
         Route::get('/admin/audit-logs', [AuditLogController::class, 'index']);
     });
 });

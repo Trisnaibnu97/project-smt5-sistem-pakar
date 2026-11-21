@@ -50,6 +50,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   const [infoMessage, setInfoMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Forgot password modal state
+  const [showForgotModal, setShowForgotModal] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotSuccess, setForgotSuccess] = useState(false);
+
   // Load public classes list for Wali Kelas registration
   useEffect(() => {
     api.getPublicClasses()
@@ -83,6 +89,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
         ...ROLES[mappedRole],
         name: res.user.name,
         email: res.user.email,
+        classes: res.user.classes,
       };
       onLogin(mappedRole, profile);
     } catch (err) {
@@ -141,6 +148,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
         ...ROLES[mappedRole],
         name: res.user.name,
         email: res.user.email,
+        classes: res.user.classes,
       };
       onLogin(mappedRole, profile);
     } catch (err) {
@@ -157,6 +165,36 @@ export const LoginPage: React.FC<LoginPageProps> = ({
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleForgotPasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!forgotEmail || !/\S+@\S+\.\S+/.test(forgotEmail)) {
+      setError('Masukkan alamat surel yang valid untuk reset password.');
+      return;
+    }
+
+    setForgotLoading(true);
+    setError('');
+    try {
+      const res = await api.resetPassword(forgotEmail);
+      setForgotSuccess(true);
+      setLoginEmail(forgotEmail);
+      setLoginPassword('password123');
+      onShowToast(res.message, 'success');
+    } catch (err: any) {
+      if (err instanceof ApiError) {
+        if (err.status === 404 || err.status === 422) {
+          setError(err.message || 'Alamat email tidak terdaftar dalam sistem.');
+        } else {
+          setError(err.message || 'Gagal mereset kata sandi.');
+        }
+      } else {
+        setError('Tidak dapat terhubung ke server backend.');
+      }
+    } finally {
+      setForgotLoading(false);
     }
   };
 
@@ -243,9 +281,23 @@ export const LoginPage: React.FC<LoginPageProps> = ({
               </div>
 
               <div className="mb-6">
-                <label className="form-label" htmlFor="login-password">
-                  Kata Sandi <span className="text-danger">*</span>
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="form-label mb-0" htmlFor="login-password">
+                    Kata Sandi <span className="text-danger">*</span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setForgotEmail(loginEmail);
+                      setError('');
+                      setForgotSuccess(false);
+                      setShowForgotModal(true);
+                    }}
+                    className="text-xs font-semibold text-primary hover:text-primary-dark transition-colors"
+                  >
+                    Lupa Kata Sandi?
+                  </button>
+                </div>
                 <div className="relative">
                   <input
                     id="login-password"
@@ -431,6 +483,132 @@ export const LoginPage: React.FC<LoginPageProps> = ({
           Alat bantu skrining awal. Bukan alat diagnosis medis, psikologis, atau penetapan label siswa.
         </p>
       </div>
+
+      {/* MODAL LUPA KATA SANDI */}
+      {showForgotModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/40 backdrop-blur-sm animate-fade-in">
+          <div className="bg-surface w-full max-w-md rounded-2xl border border-border shadow-2xl p-6 relative">
+            <button
+              onClick={() => {
+                setShowForgotModal(false);
+                setError('');
+                setForgotSuccess(false);
+              }}
+              className="absolute top-4 right-4 p-1.5 rounded-lg text-muted hover:bg-page hover:text-ink transition-colors"
+              aria-label="Tutup modal"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-primary-light flex items-center justify-center text-primary shrink-0">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-ink">Lupa Kata Sandi?</h3>
+                <p className="text-xs text-muted">Reset kata sandi akun Anda ke nilai default</p>
+              </div>
+            </div>
+
+            {forgotSuccess ? (
+              <div className="space-y-4">
+                <div className="p-4 rounded-xl bg-primary-light/60 border border-primary/30 text-xs text-primary-dark space-y-2">
+                  <div className="flex items-center gap-2 font-bold text-sm text-primary-dark">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Kata Sandi Berhasil Direset!
+                  </div>
+                  <p>
+                    Kata sandi untuk surel <span className="font-semibold underline">{forgotEmail}</span> telah diubah ke default:
+                  </p>
+                  <div className="p-2.5 bg-white rounded-lg border border-primary/40 font-mono font-bold text-center text-sm text-ink selection:bg-primary-light">
+                    password123
+                  </div>
+                  <p className="text-[11px] text-muted">
+                    Formulir login di belakang telah otomatis diisikan dengan kata sandi baru.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowForgotModal(false);
+                    setForgotSuccess(false);
+                  }}
+                  className="btn-primary w-full justify-center"
+                >
+                  Masuk Sekarang dengan Kata Sandi Baru
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleForgotPasswordSubmit} className="space-y-4">
+                <p className="text-xs text-muted leading-relaxed">
+                  Masukkan surel akun Anda yang terdaftar. Sistem akan mereset kata sandi akun Anda ke default: <code className="bg-page px-1.5 py-0.5 rounded text-primary font-bold">password123</code>.
+                </p>
+
+                {error && (
+                  <div className="p-3 bg-red-50 text-danger text-xs rounded-xl border border-red-200">
+                    {error}
+                  </div>
+                )}
+
+                <div>
+                  <label className="form-label" htmlFor="forgot-email">
+                    Alamat Surel Terdaftar <span className="text-danger">*</span>
+                  </label>
+                  <input
+                    id="forgot-email"
+                    type="email"
+                    placeholder="nama@sdit-uq.sch.id"
+                    className="form-input"
+                    value={forgotEmail}
+                    onChange={(e) => setForgotEmail(e.target.value)}
+                    required
+                    disabled={forgotLoading}
+                    autoFocus
+                  />
+                </div>
+
+                <div className="flex items-center gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowForgotModal(false);
+                      setError('');
+                    }}
+                    className="btn-secondary flex-1 justify-center"
+                    disabled={forgotLoading}
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn-primary flex-1 justify-center"
+                    disabled={forgotLoading}
+                  >
+                    {forgotLoading ? (
+                      <span className="flex items-center gap-2">
+                        <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" strokeWidth="4" stroke="currentColor" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                        </svg>
+                        Mereset…
+                      </span>
+                    ) : (
+                      'Reset Kata Sandi'
+                    )}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

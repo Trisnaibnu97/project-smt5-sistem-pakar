@@ -23,6 +23,15 @@ interface ApiScreeningItem {
     created_at: string;
     created_by_user?: { name: string; role: string };
   }>;
+  followUps?: Array<{
+    id: number;
+    action_type: string;
+    status: string;
+    notes: string;
+    created_at: string;
+    created_by_user?: { name: string; role: string };
+    createdByUser?: { name: string; role: string };
+  }>;
 }
 
 const ACTION_LABELS: Record<string, string> = {
@@ -91,14 +100,16 @@ export const TindakLanjutPage: React.FC<TindakLanjutPageProps> = ({ onShowToast 
   };
 
   // Kumpulkan seluruh follow-ups dari seluruh sesi skrining yang dapat diakses pengguna
-  const allFollowUps = screenings.flatMap((s) =>
-    (s.follow_ups || []).map((f) => ({
+  const allFollowUps = screenings.flatMap((s) => {
+    const list = s.follow_ups || s.followUps || [];
+    return list.map((f: any) => ({
       ...f,
       studentName: s.student?.name ?? 'Siswa',
       studentCode: s.student?.student_code ?? '',
       className: s.student?.school_class?.name ?? '',
-    }))
-  );
+      authorName: f.created_by_user?.name ?? f.createdByUser?.name ?? 'Staf',
+    }));
+  });
 
   const statusBadge = (status: string) => {
     switch (status) {
@@ -211,7 +222,7 @@ export const TindakLanjutPage: React.FC<TindakLanjutPageProps> = ({ onShowToast 
                       {statusBadge(t.status)}
                     </div>
                     <p className="text-xs text-muted mt-0.5">
-                      {ACTION_LABELS[t.action_type] ?? t.action_type} · Ditambahkan oleh: {t.created_by_user?.name ?? 'Staf'}
+                      {ACTION_LABELS[t.action_type] ?? t.action_type} · Ditambahkan oleh: {t.authorName ?? t.created_by_user?.name ?? t.createdByUser?.name ?? 'Staf'}
                     </p>
                     <p className="text-sm text-ink mt-1.5">{t.notes}</p>
                   </div>
