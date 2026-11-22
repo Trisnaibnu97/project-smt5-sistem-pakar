@@ -32,12 +32,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   const [activeTab, setActiveTab] = useState<'login' | 'register'>(initialTab);
 
   // Login form state
-  const [loginEmail, setLoginEmail] = useState('');
+  const [loginInput, setLoginInput] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [showLoginPassword, setShowLoginPassword] = useState(false);
 
   // Register form state
   const [regName, setRegName] = useState('');
+  const [regNip, setRegNip] = useState('');
   const [regEmail, setRegEmail] = useState('');
   const [regPassword, setRegPassword] = useState('');
   const [showRegPassword, setShowRegPassword] = useState(false);
@@ -50,9 +51,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   const [infoMessage, setInfoMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Forgot password modal state
+  // Forgot/Reset password modal state
   const [showForgotModal, setShowForgotModal] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotNip, setForgotNip] = useState('');
+  const [forgotPassword, setForgotPassword] = useState('');
+  const [forgotPasswordConfirm, setForgotPasswordConfirm] = useState('');
+  const [showForgotNewPassword, setShowForgotNewPassword] = useState(false);
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotSuccess, setForgotSuccess] = useState(false);
 
@@ -70,8 +75,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({
 
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!loginEmail || !/\S+@\S+\.\S+/.test(loginEmail)) {
-      setError('Masukkan alamat surel yang valid.');
+    if (!loginInput.trim()) {
+      setError('Masukkan Email atau NIP akun Anda.');
       return;
     }
     if (!loginPassword) {
@@ -83,7 +88,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
     setError('');
     setInfoMessage('');
     try {
-      const res = await api.login(loginEmail, loginPassword);
+      const res = await api.login(loginInput.trim(), loginPassword);
       const mappedRole = mapBackendRole(res.user.role);
       const profile: UserProfile = {
         ...ROLES[mappedRole],
@@ -95,7 +100,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
     } catch (err) {
       if (err instanceof ApiError) {
         if (err.status === 422) {
-          setError('Email atau kata sandi tidak sesuai. Periksa kembali data login Anda.');
+          setError('Email/NIP atau kata sandi tidak sesuai. Periksa kembali data login Anda.');
         } else if (err.status === 403) {
           setError('Akun Anda dinonaktifkan. Hubungi administrator.');
         } else {
@@ -116,7 +121,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
       return;
     }
     if (!regEmail || !/\S+@\S+\.\S+/.test(regEmail)) {
-      setError('Masukkan alamat surel yang valid.');
+      setError('Masukkan alamat surel yang valid (boleh surel dummy seperti nama@sdit-uq.id).');
       return;
     }
     if (!regPassword || regPassword.length < 6) {
@@ -131,6 +136,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
     try {
       const res = await api.register({
         name: regName.trim(),
+        nip: regNip.trim() || undefined,
         email: regEmail.trim(),
         password: regPassword,
         role: regRole,
@@ -171,24 +177,39 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   const handleForgotPasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!forgotEmail || !/\S+@\S+\.\S+/.test(forgotEmail)) {
-      setError('Masukkan alamat surel yang valid untuk reset password.');
+      setError('Masukkan alamat surel terdaftar.');
+      return;
+    }
+    if (!forgotPassword || forgotPassword.length < 6) {
+      setError('Kata sandi baru minimal 6 karakter.');
+      return;
+    }
+    if (forgotPassword !== forgotPasswordConfirm) {
+      setError('Konfirmasi kata sandi baru tidak cocok.');
       return;
     }
 
     setForgotLoading(true);
     setError('');
     try {
-      const res = await api.resetPassword(forgotEmail);
+      const res = await api.resetPassword({
+        email: forgotEmail.trim(),
+        nip: forgotNip.trim() || undefined,
+        password: forgotPassword,
+        password_confirmation: forgotPasswordConfirm,
+      });
       setForgotSuccess(true);
-      setLoginEmail(forgotEmail);
-      setLoginPassword('password123');
+      setLoginInput(forgotEmail.trim());
+      setLoginPassword(forgotPassword);
       onShowToast(res.message, 'success');
     } catch (err: any) {
       if (err instanceof ApiError) {
         if (err.status === 404 || err.status === 422) {
-          setError(err.message || 'Alamat email tidak terdaftar dalam sistem.');
+          const validationErrors = err.data?.errors;
+          const firstErr = validationErrors ? Object.values(validationErrors).flat()[0] : null;
+          setError(typeof firstErr === 'string' ? firstErr : (err.message || 'Data verifikasi tidak sesuai.'));
         } else {
-          setError(err.message || 'Gagal mereset kata sandi.');
+          setError(err.message || 'Gagal memperbarui kata sandi.');
         }
       } else {
         setError('Tidak dapat terhubung ke server backend.');
@@ -265,16 +286,16 @@ export const LoginPage: React.FC<LoginPageProps> = ({
           {activeTab === 'login' && (
             <form onSubmit={handleLoginSubmit} noValidate>
               <div className="mb-4">
-                <label className="form-label" htmlFor="login-email">
-                  Surel <span className="text-danger">*</span>
+                <label className="form-label" htmlFor="login-input">
+                  Surel Resmi / NIP Pegawai <span className="text-danger">*</span>
                 </label>
                 <input
-                  id="login-email"
-                  type="email"
-                  placeholder="nama@sdit-uq.sch.id"
+                  id="login-input"
+                  type="text"
+                  placeholder="nama@sdit-uq.sch.id atau ADM-001 / WL-3A01"
                   className="form-input"
-                  value={loginEmail}
-                  onChange={(e) => setLoginEmail(e.target.value)}
+                  value={loginInput}
+                  onChange={(e) => setLoginInput(e.target.value)}
                   required
                   disabled={loading}
                 />
@@ -288,7 +309,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                   <button
                     type="button"
                     onClick={() => {
-                      setForgotEmail(loginEmail);
+                      setForgotEmail(loginInput.includes('@') ? loginInput : '');
+                      setForgotNip(!loginInput.includes('@') ? loginInput : '');
+                      setForgotPassword('');
+                      setForgotPasswordConfirm('');
                       setError('');
                       setForgotSuccess(false);
                       setShowForgotModal(true);
@@ -363,19 +387,40 @@ export const LoginPage: React.FC<LoginPageProps> = ({
               </div>
 
               <div className="mb-4">
+                <label className="form-label" htmlFor="reg-nip">
+                  Nomor Induk Pegawai (NIP / Kode Guru) <span className="text-xs text-muted font-normal">(Opsional)</span>
+                </label>
+                <input
+                  id="reg-nip"
+                  type="text"
+                  placeholder="Contoh: WL-3B01 atau 19870501"
+                  className="form-input"
+                  value={regNip}
+                  onChange={(e) => setRegNip(e.target.value)}
+                  disabled={loading}
+                />
+                <p className="text-[11px] text-muted mt-0.5">
+                  NIP dapat digunakan sebagai identitas login atau verifikasi pembaruan kata sandi.
+                </p>
+              </div>
+
+              <div className="mb-4">
                 <label className="form-label" htmlFor="reg-email">
-                  Surel Resmi <span className="text-danger">*</span>
+                  Surel (Email Akun) <span className="text-danger">*</span>
                 </label>
                 <input
                   id="reg-email"
                   type="email"
-                  placeholder="nama@sdit-uq.sch.id"
+                  placeholder="nama@sdit-uq.sch.id (bisa email dummy)"
                   className="form-input"
                   value={regEmail}
                   onChange={(e) => setRegEmail(e.target.value)}
                   required
                   disabled={loading}
                 />
+                <p className="text-[11px] text-muted mt-0.5">
+                  Boleh menggunakan surel dummy jika sensitif terhadap email resmi.
+                </p>
               </div>
 
               <div className="mb-4">
@@ -509,8 +554,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                 </svg>
               </div>
               <div>
-                <h3 className="text-lg font-bold text-ink">Lupa Kata Sandi?</h3>
-                <p className="text-xs text-muted">Reset kata sandi akun Anda ke nilai default</p>
+                <h3 className="text-lg font-bold text-ink">Perbarui Kata Sandi</h3>
+                <p className="text-xs text-muted">Tetapkan kata sandi baru untuk akun Anda</p>
               </div>
             </div>
 
@@ -521,16 +566,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    Kata Sandi Berhasil Direset!
+                    Kata Sandi Berhasil Diperbarui!
                   </div>
                   <p>
-                    Kata sandi untuk surel <span className="font-semibold underline">{forgotEmail}</span> telah diubah ke default:
-                  </p>
-                  <div className="p-2.5 bg-white rounded-lg border border-primary/40 font-mono font-bold text-center text-sm text-ink selection:bg-primary-light">
-                    password123
-                  </div>
-                  <p className="text-[11px] text-muted">
-                    Formulir login di belakang telah otomatis diisikan dengan kata sandi baru.
+                    Kata sandi untuk surel <span className="font-semibold underline">{forgotEmail}</span> telah berhasil diganti. Formulir login di belakang telah diisikan dengan kata sandi baru Anda.
                   </p>
                 </div>
 
@@ -546,9 +585,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleForgotPasswordSubmit} className="space-y-4">
+              <form onSubmit={handleForgotPasswordSubmit} className="space-y-3.5">
                 <p className="text-xs text-muted leading-relaxed">
-                  Masukkan surel akun Anda yang terdaftar. Sistem akan mereset kata sandi akun Anda ke default: <code className="bg-page px-1.5 py-0.5 rounded text-primary font-bold">password123</code>.
+                  Masukkan surel akun dan NIP yang terdaftar untuk verifikasi, lalu masukkan kata sandi baru Anda.
                 </p>
 
                 {error && (
@@ -564,13 +603,70 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                   <input
                     id="forgot-email"
                     type="email"
-                    placeholder="nama@sdit-uq.sch.id"
-                    className="form-input"
+                    placeholder="nama@sdit-uq.sch.id (atau surel dummy saat daftar)"
+                    className="form-input text-xs"
                     value={forgotEmail}
                     onChange={(e) => setForgotEmail(e.target.value)}
                     required
                     disabled={forgotLoading}
                     autoFocus
+                  />
+                </div>
+
+                <div>
+                  <label className="form-label" htmlFor="forgot-nip">
+                    NIP / Kode Guru <span className="text-xs text-muted font-normal">(Jika akun memiliki NIP)</span>
+                  </label>
+                  <input
+                    id="forgot-nip"
+                    type="text"
+                    placeholder="Contoh: ADM-001, BK-001, atau WL-3A01"
+                    className="form-input text-xs"
+                    value={forgotNip}
+                    onChange={(e) => setForgotNip(e.target.value)}
+                    disabled={forgotLoading}
+                  />
+                </div>
+
+                <div>
+                  <label className="form-label" htmlFor="forgot-new-pwd">
+                    Kata Sandi Baru (Min. 6 Karakter) <span className="text-danger">*</span>
+                  </label>
+                  <div className="relative">
+                    <input
+                      id="forgot-new-pwd"
+                      type={showForgotNewPassword ? 'text' : 'password'}
+                      placeholder="Masukkan kata sandi baru"
+                      className="form-input text-xs pr-9"
+                      value={forgotPassword}
+                      onChange={(e) => setForgotPassword(e.target.value)}
+                      required
+                      disabled={forgotLoading}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowForgotNewPassword(!showForgotNewPassword)}
+                      aria-label="Tampilkan/sembunyikan kata sandi"
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted hover:text-ink text-xs"
+                    >
+                      {showForgotNewPassword ? 'Sembunyi' : 'Lihat'}
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="form-label" htmlFor="forgot-confirm-pwd">
+                    Konfirmasi Kata Sandi Baru <span className="text-danger">*</span>
+                  </label>
+                  <input
+                    id="forgot-confirm-pwd"
+                    type={showForgotNewPassword ? 'text' : 'password'}
+                    placeholder="Ketik ulang kata sandi baru"
+                    className="form-input text-xs"
+                    value={forgotPasswordConfirm}
+                    onChange={(e) => setForgotPasswordConfirm(e.target.value)}
+                    required
+                    disabled={forgotLoading}
                   />
                 </div>
 
@@ -597,10 +693,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                           <circle className="opacity-25" cx="12" cy="12" r="10" strokeWidth="4" stroke="currentColor" />
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
                         </svg>
-                        Mereset…
+                        Menyimpan…
                       </span>
                     ) : (
-                      'Reset Kata Sandi'
+                      'Simpan Kata Sandi'
                     )}
                   </button>
                 </div>

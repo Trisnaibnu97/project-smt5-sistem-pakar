@@ -115,11 +115,10 @@ export const KelolaLandingPage: React.FC<KelolaLandingPageProps> = ({
           <button
             type="button"
             onClick={handleSave}
-            className={`px-5 py-2.5 text-sm font-bold text-white rounded-xl shadow-md transition-all flex items-center gap-2 active:scale-95 ${
-              hasChanges
-                ? 'bg-amber hover:bg-amber-dark shadow-amber/30 animate-pulse ring-2 ring-amber/50'
-                : 'bg-primary hover:bg-primary-dark shadow-primary/20'
-            }`}
+            className={`px-5 py-2.5 text-sm font-bold text-white rounded-xl shadow-md transition-all flex items-center gap-2 active:scale-95 ${hasChanges
+              ? 'bg-amber hover:bg-amber-dark shadow-amber/30 animate-pulse ring-2 ring-amber/50'
+              : 'bg-primary hover:bg-primary-dark shadow-primary/20'
+              }`}
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -133,41 +132,37 @@ export const KelolaLandingPage: React.FC<KelolaLandingPageProps> = ({
       <div className="flex items-center gap-2 border-b border-border pb-1 overflow-x-auto">
         <button
           onClick={() => setActiveTab('hero')}
-          className={`px-5 py-2.5 text-sm font-bold rounded-xl transition-all flex items-center gap-2 ${
-            activeTab === 'hero'
-              ? 'bg-primary text-white shadow-sm'
-              : 'text-muted hover:text-navy hover:bg-slate-100'
-          }`}
+          className={`px-5 py-2.5 text-sm font-bold rounded-xl transition-all flex items-center gap-2 ${activeTab === 'hero'
+            ? 'bg-primary text-white shadow-sm'
+            : 'text-muted hover:text-navy hover:bg-slate-100'
+            }`}
         >
           <span>🎯</span> Hero & Headline Utama
         </button>
         <button
           onClick={() => setActiveTab('features')}
-          className={`px-5 py-2.5 text-sm font-bold rounded-xl transition-all flex items-center gap-2 ${
-            activeTab === 'features'
-              ? 'bg-primary text-white shadow-sm'
-              : 'text-muted hover:text-navy hover:bg-slate-100'
-          }`}
+          className={`px-5 py-2.5 text-sm font-bold rounded-xl transition-all flex items-center gap-2 ${activeTab === 'features'
+            ? 'bg-primary text-white shadow-sm'
+            : 'text-muted hover:text-navy hover:bg-slate-100'
+            }`}
         >
           <span>✨</span> Fitur & Keunggulan
         </button>
         <button
           onClick={() => setActiveTab('contact')}
-          className={`px-5 py-2.5 text-sm font-bold rounded-xl transition-all flex items-center gap-2 ${
-            activeTab === 'contact'
-              ? 'bg-primary text-white shadow-sm'
-              : 'text-muted hover:text-navy hover:bg-slate-100'
-          }`}
+          className={`px-5 py-2.5 text-sm font-bold rounded-xl transition-all flex items-center gap-2 ${activeTab === 'contact'
+            ? 'bg-primary text-white shadow-sm'
+            : 'text-muted hover:text-navy hover:bg-slate-100'
+            }`}
         >
           <span>📞</span> Kontak & Alamat Sekolah
         </button>
         <button
           onClick={() => setActiveTab('preview')}
-          className={`px-5 py-2.5 text-sm font-bold rounded-xl transition-all flex items-center gap-2 ${
-            activeTab === 'preview'
-              ? 'bg-primary text-white shadow-sm'
-              : 'text-muted hover:text-navy hover:bg-slate-100'
-          }`}
+          className={`px-5 py-2.5 text-sm font-bold rounded-xl transition-all flex items-center gap-2 ${activeTab === 'preview'
+            ? 'bg-primary text-white shadow-sm'
+            : 'text-muted hover:text-navy hover:bg-slate-100'
+            }`}
         >
           <span>👁️</span> Pratinjau Teks
         </button>

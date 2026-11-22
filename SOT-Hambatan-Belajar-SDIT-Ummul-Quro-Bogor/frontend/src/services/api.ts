@@ -58,14 +58,14 @@ export const api = {
   },
 
   // Auth endpoints
-  async login(email: string, password: string) {
+  async login(login: string, password: string) {
     const res = await this.request<{
       message: string;
       token: string;
-      user: { id: number; name: string; email: string; role: string; classes: any[] };
+      user: { id: number; name: string; nip?: string; email: string; role: string; classes: any[] };
     }>('/auth/login', {
       method: 'POST',
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ login, password }),
     });
     this.setToken(res.token);
     return res;
@@ -73,6 +73,7 @@ export const api = {
 
   async register(payload: {
     name: string;
+    nip?: string;
     email: string;
     password: string;
     role: 'admin' | 'guru_bk' | 'wali_kelas';
@@ -81,7 +82,7 @@ export const api = {
     const res = await this.request<{
       message: string;
       token: string;
-      user: { id: number; name: string; email: string; role: string; classes: any[] };
+      user: { id: number; name: string; nip?: string; email: string; role: string; classes: any[] };
       redirected_to_wali?: boolean;
     }>('/auth/register', {
       method: 'POST',
@@ -97,13 +98,17 @@ export const api = {
     }>('/public/classes');
   },
 
-  async resetPassword(email: string) {
+  async resetPassword(payload: {
+    email: string;
+    nip?: string;
+    password: string;
+    password_confirmation: string;
+  }) {
     return this.request<{
       message: string;
-      default_password: string;
     }>('/auth/reset-password', {
       method: 'POST',
-      body: JSON.stringify({ email }),
+      body: JSON.stringify(payload),
     });
   },
 

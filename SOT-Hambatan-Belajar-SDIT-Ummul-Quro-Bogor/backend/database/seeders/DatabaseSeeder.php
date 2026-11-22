@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             ['email' => 'admin@sdit-uq.sch.id'],
             [
                 'name'      => 'Administrator Sistem [DEMO]',
+                'nip'       => 'ADM-001',
                 'password'  => Hash::make('password123'),
                 'role'      => 'admin',
                 'is_active' => true,
@@ -35,6 +36,7 @@ class DatabaseSeeder extends Seeder
             ['email' => 'bk@sdit-uq.sch.id'],
             [
                 'name'      => 'Ustadzah Rahma, S.Psi (Guru BK) [DEMO]',
+                'nip'       => 'BK-001',
                 'password'  => Hash::make('password123'),
                 'role'      => 'guru_bk',
                 'is_active' => true,
@@ -45,6 +47,7 @@ class DatabaseSeeder extends Seeder
             ['email' => 'wali3a@sdit-uq.sch.id'],
             [
                 'name'      => 'Ustadz Ahmad, S.Pd (Wali Kelas 3A) [DEMO]',
+                'nip'       => 'WL-3A01',
                 'password'  => Hash::make('password123'),
                 'role'      => 'wali_kelas',
                 'is_active' => true,

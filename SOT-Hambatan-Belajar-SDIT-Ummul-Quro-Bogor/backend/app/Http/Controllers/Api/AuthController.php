@@ -21,10 +21,13 @@ class AuthController extends Controller
     {
         $validated = $request->validate([
             'name'     => 'required|string|max:100',
+            'nip'      => 'nullable|string|max:50|unique:users,nip',
             'email'    => 'required|email|max:150|unique:users,email',
             'password' => 'required|string|min:6',
             'role'     => 'required|in:admin,guru_bk,wali_kelas',
             'class_id' => 'nullable|exists:classes,id',
+        ], [
+            'nip.unique' => 'NIP / Nomor Pegawai ini sudah terdaftar pada akun lain.',
         ]);
 
         $requestedRole = $validated['role'];
@@ -44,6 +47,7 @@ class AuthController extends Controller
 
         $user = User::create([
             'name'      => $validated['name'],
+            'nip'       => !empty($validated['nip']) ? trim($validated['nip']) : null,
             'email'     => $validated['email'],
             'password'  => Hash::make($validated['password']),
             'role'      => $assignedRole,
@@ -62,6 +66,7 @@ class AuthController extends Controller
 
         AuditLog::record($user->id, 'AUTH_REGISTER', 'users', $user->id, [
             'name'           => $user->name,
+            'nip'            => $user->nip,
             'email'          => $user->email,
             'requested_role' => $requestedRole,
             'assigned_role'  => $assignedRole,
@@ -74,6 +79,7 @@ class AuthController extends Controller
             'user'    => [
                 'id'      => $user->id,
                 'name'    => $user->name,
+                'nip'     => $user->nip,
                 'email'   => $user->email,
                 'role'    => $user->role,
                 'classes' => $user->classes()->select('classes.id', 'classes.name', 'classes.grade_level')->get(),
@@ -84,19 +90,25 @@ class AuthController extends Controller
 
     /**
      * Authenticate user and issue token.
+     * Mendukung login dengan Email ATAU NIP / Nomor Pegawai.
      */
     public function login(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'email'    => 'required|email',
+            'login'    => 'required|string',
             'password' => 'required|string',
         ]);
 
-        $user = User::where('email', $validated['email'])->first();
+        $loginInput = trim($validated['login']);
+
+        // Cari user berdasarkan email ATAU NIP
+        $user = User::where('email', $loginInput)
+            ->orWhere('nip', $loginInput)
+            ->first();
 
         if (!$user || !Hash::check($validated['password'], $user->password)) {
             throw ValidationException::withMessages([
-                'email' => ['Kredensial yang diberikan tidak cocok dengan data kami.'],
+                'login' => ['Kredensial (Email/NIP atau kata sandi) tidak cocok dengan data kami.'],
             ]);
         }
 
@@ -109,6 +121,7 @@ class AuthController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
 
         AuditLog::record($user->id, 'AUTH_LOGIN', 'users', $user->id, [
+            'nip'   => $user->nip,
             'email' => $user->email,
             'role'  => $user->role,
         ], $request->ip());
@@ -119,6 +132,7 @@ class AuthController extends Controller
             'user'    => [
                 'id'      => $user->id,
                 'name'    => $user->name,
+                'nip'     => $user->nip,
                 'email'   => $user->email,
                 'role'    => $user->role,
                 'classes' => $user->classes()->select('classes.id', 'classes.name', 'classes.grade_level')->get(),
@@ -162,36 +176,54 @@ class AuthController extends Controller
     }
 
     /**
-     * Reset password user ke password default ('password123') berdasarkan email.
+     * Perbarui kata sandi baru secara mandiri.
+     * Pengguna memverifikasi identitas menggunakan kombinasi Email & NIP (Nomor Pegawai).
+     * Jika cocok, sistem langsung mengupdate password ke kata sandi baru.
      */
     public function resetPassword(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'email' => 'required|email|exists:users,email',
+            'email'    => 'required|email|exists:users,email',
+            'nip'      => 'nullable|string',
+            'password' => 'required|string|min:6|confirmed',
         ], [
-            'email.required' => 'Email wajib diisi.',
-            'email.email'    => 'Format email tidak valid.',
-            'email.exists'   => 'Alamat email tidak terdaftar dalam sistem.',
+            'email.required'     => 'Email terdaftar wajib diisi.',
+            'email.email'        => 'Format email tidak valid.',
+            'email.exists'       => 'Alamat email tidak terdaftar dalam sistem.',
+            'password.required'  => 'Kata sandi baru wajib diisi.',
+            'password.min'       => 'Kata sandi baru minimal 6 karakter.',
+            'password.confirmed' => 'Konfirmasi kata sandi baru tidak cocok.',
         ]);
 
         $user = User::where('email', $validated['email'])->firstOrFail();
 
-        $defaultPassword = 'password123';
-        $user->password = Hash::make($defaultPassword);
+        // Jika akun memiliki NIP terdaftar, wajib verifikasi NIP
+        if (!empty($user->nip)) {
+            $inputNip = trim($validated['nip'] ?? '');
+            if (empty($inputNip) || strcasecmp($user->nip, $inputNip) !== 0) {
+                throw ValidationException::withMessages([
+                    'nip' => ['Nomor Induk Pegawai (NIP) tidak cocok dengan akun ini.'],
+                ]);
+            }
+        }
+
+        $user->password = Hash::make($validated['password']);
         $user->save();
 
         AuditLog::record(
             $user->id,
-            'RESET_PASSWORD_DEFAULT',
+            'RESET_PASSWORD_CUSTOM',
             'users',
             $user->id,
-            ['reset_to_default' => true],
+            [
+                'email' => $user->email,
+                'nip'   => $user->nip,
+            ],
             $request->ip()
         );
 
         return response()->json([
-            'message' => 'Kata sandi berhasil direset ke default: password123. Silakan masuk menggunakan kata sandi tersebut.',
-            'default_password' => $defaultPassword,
+            'message' => 'Kata sandi Anda berhasil diperbarui! Silakan masuk menggunakan kata sandi baru Anda.',
         ]);
     }
 }
